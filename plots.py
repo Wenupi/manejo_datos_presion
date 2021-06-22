@@ -12,16 +12,16 @@ t_rotatoria = DF['tiempo_rotatoria(min)']
 presion_difusora = DF['presion_difusora(Pa)'][:4]
 presion_rotatoria = DF['presion_rotatoria(mbar)']*100
 
-def inversa(x, a, base, b):
-    return 1/((x+a)**base) + b
+def inversa(x, a, exponente, b):
+    return 1/((x+a)**exponente) + b
 
-popt_difusora, pcov_difusora = curve_fit(inversa, t_difusora, presion_difusora,
+popt_difusora, pcov_difusora = curve_fit(inversa, t_difusora-t_difusora[0], presion_difusora,
                                          p0=(4, 2, 0))
-popt_rotatoria, pcov_rotatoria = curve_fit(inversa, t_rotatoria, presion_rotatoria,
-                                           p0=(4, 2, 0))
+#popt_rotatoria, pcov_rotatoria = curve_fit(inversa, t_rotatoria-t_rotatoria[0], presion_rotatoria,
+#                                           p0=(4, 2, 0))
 
-spline2 = CubicSpline(t_rotatoria, presion_rotatoria)
-tiempo_dif_plot = np.linspace(t_difusora[0]-5, np.max(t_difusora), 1000)
+#spline2 = CubicSpline(t_rotatoria, presion_rotatoria)
+tiempo_dif_plot = np.linspace(t_difusora[0], np.max(t_difusora), 1000)
 tiempo_rot_plot = np.linspace(t_rotatoria[0], np.max(t_rotatoria), 1000)
 
 plt.rcParams['axes.grid'] = True
@@ -30,28 +30,30 @@ plt.rcParams['grid.color'] = "#cccccc"
 plt.rcParams.update({"font.size": 9, "font.family": "serif"})
 
 fig1, ax1 = plt.subplots(figsize=(3.25, 3.25))
-ax1.scatter(t_difusora, presion_difusora, zorder=2)
-ax1.plot(tiempo_dif_plot, inversa(tiempo_dif_plot, *popt_difusora),
+ax1.scatter(t_difusora-t_difusora[0], presion_difusora, zorder=2)
+ax1.plot(tiempo_dif_plot-tiempo_dif_plot[0],
+         inversa(tiempo_dif_plot-tiempo_dif_plot[0], *popt_difusora),
          label='Interpolación')
 ax1.set_xlabel('Tiempo [min]')
 ax1.set_ylabel('Presión [Pa]')
 ax1.set_yscale('log')
 ax1.legend()
 fig1.tight_layout()    
-fig1.savefig("img/presion-difusora.png")
+fig1.savefig("img/presion-difusora.pdf")
 
 fig2, ax2 = plt.subplots(figsize=(3.25, 3.25))
-ax2.scatter(t_rotatoria, presion_rotatoria, zorder=2)
+ax2.scatter(t_rotatoria-t_rotatoria[0], presion_rotatoria, zorder=3)
 #ax2.plot(tiempo_rot_plot, inversa(tiempo_rot_plot, *popt_rotatoria),
 #         label='Interpolación')
-ax2.plot(tiempo_rot_plot, spline2(tiempo_rot_plot))
+#ax2.plot(tiempo_rot_plot, spline2(tiempo_rot_plot))
+ax2.plot(t_rotatoria-t_rotatoria[0], presion_rotatoria, zorder=2)
 ax2.set_xlabel('Tiempo [min]')
 ax2.set_ylabel('Presión [Pa]')
-#ax2.set_yscale('log')
+ax2.set_yscale('log')
 fig2.tight_layout()    
-fig2.savefig("img/presion-rotatoria.png")
+fig2.savefig("img/presion-rotatoria.pdf")
 
-fig3, ax3 = plt.subplots(figsize=(3.25, 3.25))
-ax3.plot(tiempo_rot_plot, inversa(tiempo_rot_plot, *popt_rotatoria))
-ax3.set_yscale('log')
-fig3.show()
+#fig3, ax3 = plt.subplots(figsize=(3.25, 3.25))
+#ax3.plot(tiempo_rot_plot, inversa(tiempo_rot_plot, *popt_rotatoria))
+#ax3.set_yscale('log')
+#fig3.show()
