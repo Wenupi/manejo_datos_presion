@@ -8,9 +8,11 @@ name = 'datos_presion_U2.xlsx'
 DF = pd.read_excel(name, engine='openpyxl')
 
 t_difusora = DF['tiempo_difusora(min)'][:4]
-t_rotatoria = DF['tiempo_rotatoria(min)']
+t_rotatoria = DF['tiempo_rotatoria(min)'][:14]
 presion_difusora = DF['presion_difusora(Pa)'][:4]
-presion_rotatoria = DF['presion_rotatoria(mbar)']*100
+presion_rotatoria = DF['presion_rotatoria(mbar)'][:14]*100
+t_d_r = DF['tiempo_d-r']
+presion_d_r = DF['presion_d-r(mTorr)']*0.1333223
 
 def inversa(x, a, exponente, b):
     return 1/((x+a)**exponente) + b
@@ -53,7 +55,15 @@ ax2.set_yscale('log')
 fig2.tight_layout()    
 fig2.savefig("img/presion-rotatoria.pdf")
 
-#fig3, ax3 = plt.subplots(figsize=(3.25, 3.25))
-#ax3.plot(tiempo_rot_plot, inversa(tiempo_rot_plot, *popt_rotatoria))
+fig3, ax3 = plt.subplots(figsize=(3.25, 3.25))
+ax3.scatter(t_d_r-t_d_r[0], presion_d_r, zorder=3)
+#ax3.plot(tiempo_dif_plot-tiempo_dif_plot[0],
+#         inversa(tiempo_dif_plot-tiempo_dif_plot[0], *popt_difusora),
+#         label='Interpolación')
+ax3.plot(t_d_r-t_d_r[0], presion_d_r, zorder=2)
+ax3.set_xlabel('Tiempo [min]')
+ax3.set_ylabel('Presión [Pa]')
 #ax3.set_yscale('log')
-#fig3.show()
+#ax3.legend()
+fig3.tight_layout()    
+fig3.savefig("img/presion-d-r.pdf")
